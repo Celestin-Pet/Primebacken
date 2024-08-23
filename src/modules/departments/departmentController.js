@@ -1,20 +1,26 @@
-import { getDepartments, createDepartment } from './departmentService.js';
+import { PrismaClient } from '@prisma/client';
 
-export async function getDepartmentsController(req, res) {
+const prisma = new PrismaClient();
+
+export const getDepartments = async (req, res) => {
   try {
-    const departments = await getDepartments();
-    res.json({ departments });
+    const departments = await prisma.department.findMany();
+    res.json(departments);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve departments' });
+    res.status(500).json({ message: 'Server error' });
   }
-}
+};
 
-export async function createDepartmentController(req, res) {
+export const createDepartment = async (req, res) => {
   try {
     const { name } = req.body;
-    const newDepartment = await createDepartment({ name });
-    res.status(201).json(newDepartment);
+    const department = await prisma.department.create({
+      data: {
+        name,
+      },
+    });
+    res.status(201).json(department);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create department' });
+    res.status(500).json({ message: 'Server error' });
   }
-}
+};
